@@ -1,4 +1,5 @@
 import numpy as np
+from copy import deepcopy
 from datetime import datetime
 
 from FW.constraint import L1Ball
@@ -31,7 +32,7 @@ class Trace:
             if self.f is not None:
                 fx = self.f(dl["x"])
                 self.trace_fx.append(fx)
-                print(f"loss: {fx}")
+                # print(f"loss: {fx}")
             else:
                 self.trace_x.append(dl["x"].copy())
             delta = (datetime.now() - self.start).total_seconds()
@@ -40,14 +41,15 @@ class Trace:
         self._counter += 1
 
 
-def test_fw(loss_func, constraint, x0):
+def test_fw(loss_func, constraint, x0, max_iter=50):
     cb = Trace(f=loss_func)
     opt = minimize_frank_wolfe(
             loss_func,
             x0,
             constraint.lmo,
             tol=1e-3,
-            callback=cb
+            callback=cb,
+            max_iter=max_iter
         )
     
     assert np.isfinite(opt.x).sum() == n_features
@@ -55,19 +57,41 @@ def test_fw(loss_func, constraint, x0):
 
 
 if __name__ == "__main__":
-    n_features, n_out = 20 , 10
-    alpha = 1
+    np.random.seed(0)
+    n_features, n_out = 400 , 20
+    alpha = 0.5
 
     A = np.random.randn(n_out, n_features)
     b = np.random.randn(n_out)
     x0 = np.zeros(n_features)
 
     loss_func = SquaredLoss(A, b)
-    l1ball = L1Ball(alpha=alpha)
 
-    cb = test_fw(loss_func, l1ball, x0)
-    
+    l1ball_1 = L1Ball(alpha=0.1)
+    cb_1 = test_fw(loss_func, l1ball_1, deepcopy(x0))
+
+    l1ball_2 = L1Ball(alpha=0.4)
+    cb_2 = test_fw(loss_func, l1ball_2, deepcopy(x0))
+
+    l1ball_3 = L1Ball(alpha=0.7)
+    cb_3 = test_fw(loss_func, l1ball_3, deepcopy(x0))
+
+    l1ball_4 = L1Ball(alpha=1)
+    cb_4 = test_fw(loss_func, l1ball_4, deepcopy(x0))
+
+    l1ball_5 = L1Ball(alpha=2)
+    cb_5 = test_fw(loss_func, l1ball_5, deepcopy(x0))
+
     from matplotlib import pyplot as plt
-    plt.plot(cb.trace_fx)
+
+    # x_axix = range(1, 201)
+    plt.plot(range(1, len(cb_1.trace_fx)+1), cb_1.trace_fx, color='green', label='t = 0.1')
+    plt.plot(range(1, len(cb_2.trace_fx)+1), cb_2.trace_fx, color='red', label='t = 0.4')
+    plt.plot(range(1, len(cb_3.trace_fx)+1), cb_3.trace_fx,  color='skyblue', label='t = 0.7')
+    plt.plot(range(1, len(cb_4.trace_fx)+1), cb_4.trace_fx, color='blue', label='t = 1')
+    plt.plot(range(1, len(cb_5.trace_fx)+1), cb_5.trace_fx, color='purple', label='t = 2')
+    plt.legend() # 显示图例
+    plt.xlabel('Iterations')
+    plt.ylabel('Squared Loss')
     plt.show()
 
