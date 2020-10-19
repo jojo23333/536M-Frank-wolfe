@@ -85,13 +85,14 @@ if __name__ == "__main__":
     from matplotlib import pyplot as plt
 
     # x_axix = range(1, 201)
-    plt.plot(range(1, len(cb_1.trace_fx)+1), cb_1.trace_fx, color='green', label='t = 0.1')
-    plt.plot(range(1, len(cb_2.trace_fx)+1), cb_2.trace_fx, color='red', label='t = 0.4')
-    plt.plot(range(1, len(cb_3.trace_fx)+1), cb_3.trace_fx,  color='skyblue', label='t = 0.7')
-    plt.plot(range(1, len(cb_4.trace_fx)+1), cb_4.trace_fx, color='blue', label='t = 1')
-    plt.plot(range(1, len(cb_5.trace_fx)+1), cb_5.trace_fx, color='purple', label='t = 2')
-    plt.legend() # 显示图例
-    plt.xlabel('Iterations')
-    plt.ylabel('Squared Loss')
+    plt.plot(range(0, len(cb_1.trace_fx)), cb_1.trace_fx, color='green', label='t = 0.1')
+    plt.plot(range(0, len(cb_2.trace_fx)), cb_2.trace_fx, color='red', label='t = 0.4')
+    plt.plot(range(0, len(cb_3.trace_fx)), cb_3.trace_fx,  color='skyblue', label='t = 0.7')
+    plt.plot(range(0, len(cb_4.trace_fx)), cb_4.trace_fx, color='blue', label='t = 1')
+    plt.plot(range(0, len(cb_5.trace_fx)), cb_5.trace_fx, color='purple', label='t = 2')
+    plt.legend(fontsize=18) # 显示图例
+    plt.tick_params(labelsize=18)
+    plt.xlabel('Iterations', fontsize=18)
+    plt.ylabel('Squared Loss', fontsize=18)
     plt.show()
 
